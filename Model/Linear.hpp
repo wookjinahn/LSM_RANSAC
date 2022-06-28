@@ -24,10 +24,8 @@ namespace Model
 		int GetInlierNum();
 		void Predict(std::vector<float>& outputX, std::vector<float>& outputY);
 
-		std::vector<float> GetInputX() const;
-		void SetInputX(std::vector<float> inputX);
-		std::vector<float> GetInputY() const;
-		void SetInputY(std::vector<float> inputY);
+		std::vector<CamelVector::Vector2D> GetInputData() const;
+		void SetInputX(std::vector<CamelVector::Vector2D> inputData);
 
 		float GetParamsA() const;
 		void SetParamsA(float a);

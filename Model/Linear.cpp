@@ -3,7 +3,7 @@
 //
 
 #include <random>
-#include <math.h>
+#include <cmath>
 #include "Linear.hpp"
 
 namespace Model
@@ -101,9 +101,9 @@ namespace Model
 	int Linear::GetInlierNum()
 	{
 		int inlierNum = 0;
-		for (int i = 0; i < mInputX.size(); i++)
+		for (int i = 0; i < mInputData.size(); i++)
 		{
-			if (bIsInThreshold(mInputX[i], mInputY[i]))
+			if (bIsInThreshold(mInputData[i].GetX(), mInputData[i].GetY()))
 			{
 				inlierNum++;
 			}
@@ -120,24 +120,14 @@ namespace Model
 		}
 	}
 
-	std::vector<float> Linear::GetInputX() const
+	std::vector<CamelVector::Vector2D> Linear::GetInputData() const
 	{
-		return mInputX;
+		return mInputData;
 	}
 
-	void Linear::SetInputX(std::vector<float> inputX)
+	void Linear::SetInputX(std::vector<CamelVector::Vector2D> inputData)
 	{
-		mInputX = std::move(inputX);
-	}
-
-	std::vector<float> Linear::GetInputY() const
-	{
-		return mInputY;
-	}
-
-	void Linear::SetInputY(std::vector<float> inputY)
-	{
-		mInputX = std::move(inputY);
+		mInputData = std::move(inputData);
 	}
 
 	float Linear::GetParamsA() const

@@ -7,12 +7,13 @@
 
 #include <iostream>
 #include <random>
+
 #include "../Model/Linear.hpp"
 #include "../Model/Plane.hpp"
 
 namespace camel
 {
-	template<typename MODEL>
+	template<typename Model>
 	class RANSAC
 	{
 		// 1. <Sample> the number of data points required to fit the model
@@ -24,9 +25,22 @@ namespace camel
 		// e : Outlier ratio ( = # of outliers / # of data points )
 		// T : Number of trials (
 	public:
+		RANSAC(Model& model, float modelThreshold)
+		: mModel(model)
+		, mMaxIteration(500)
+		{
+
+		}
+
 
 	private:
-		MODEL mModel;
+		bool bIsInThreshold()
+		{
+
+//			float distance = std::abs(mModel.GetParameters)
+		}
+
+		Model mModel;
 
 		int mMaxIteration = 0;
 		std::vector<float> mBestModelParams;

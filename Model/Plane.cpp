@@ -8,37 +8,27 @@
 
 namespace Model
 {
-	Plane::Plane(std::vector<CamelVector::Point3D>& data)
-	{
-		mData = std::move(data);
-	}
-
-	void Plane::SetData(std::vector<CamelVector::Point3D>& data)
-	{
-		mData = std::move(data);
-	}
-
-	std::vector<CamelVector::Point3D> Plane::GetData() const
-	{
-		return mData;
-	}
-
 	std::vector<float> Plane::GetParameters() const
 	{
 		return mParameters;
 	}
 
-	void Plane::FindParametersWithAll() 	// ax + by + c = z
+	void Plane::SetModelThreshold(float modelThreshold)
 	{
-		int pointsNum = mData.size();
+		mModelThreshold = modelThreshold;
+	}
+
+	void Plane::FindParametersWithAll(std::vector<CamelVector::Point3D>& data) 	// ax + by + c = z
+	{
+		int pointsNum = data.size();
 		cv::Mat leftMat = cv::Mat::ones(pointsNum, 3, CV_32F);
 		cv::Mat pinvLeftMat = cv::Mat::zeros(3, pointsNum, CV_32F);
 
 		// make X matrix for LinearRegression.
 		for (int i = 0; i < leftMat.rows; i++)
 		{
-			leftMat.at<float>(i, 0) = mData[i].GetX();
-			leftMat.at<float>(i, 1) = mData[i].GetY();
+			leftMat.at<float>(i, 0) = data[i].GetX();
+			leftMat.at<float>(i, 1) = data[i].GetY();
 		}
 
 		cv::invert(leftMat, pinvLeftMat, cv::DECOMP_SVD); 	// svd for pseudo inverse
@@ -47,7 +37,7 @@ namespace Model
 		cv::Mat rightMat(pointsNum, 1, CV_32F);
 		for (int i = 0; i < rightMat.rows; i++)
 		{
-			rightMat.at<float>(i,0) = mData[i].GetZ();
+			rightMat.at<float>(i,0) = data[i].GetZ();
 		}
 
 		cv::Mat paramsMat = pinvLeftMat * rightMat;
@@ -87,5 +77,15 @@ namespace Model
 		mParameters.push_back(paramsMat.at<float>(0, 0));
 		mParameters.push_back(paramsMat.at<float>(0, 1));
 		mParameters.push_back(paramsMat.at<float>(0, 2));
+	}
+
+	bool Plane::bIsInThreshold(CamelVector::Point3D& data)
+	{
+		float distance = std::abs(mParameters[0] * data.GetX() + mParameters[1] * data.GetY() - data.GetZ() + mParameters[2]) / std::sqrt(mParameters[0] * mParameters[0] + mParameters[1] * mParameters[1] + 1);
+		if (distance < mModelThreshold)
+		{
+			return true;
+		}
+		return false;
 	}
 }

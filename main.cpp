@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <chrono>
 
 #include <matplotlibcpp.h>
 
@@ -12,69 +13,58 @@
 #include "Model/Linear.hpp"
 #include "Model/Plane.hpp"
 
-// random sample line
-void makeLinearRegressionSample(std::vector<CamelVector::Vector2D>& data)
-{
-	std::random_device randomDevice;
-//	std::mt19937 generator(randomDevice());
-	std::mt19937 generator(201824627);
-	std::uniform_real_distribution<float> randomSample(0.0f, 5.0f);
-	std::uniform_real_distribution<float> randomX(1.0f, 5.0f);
-	std::uniform_real_distribution<float> line(-1.0f, 1.0f);
 
-	// randomly spread 50 * 50
-	for (int i = 0; i < 50; i++)
-	{
-		data.push_back(CamelVector::Vector2D(randomSample(generator), randomSample(generator)));
-//		x.push_back(randomSample(generator));
-//		y.push_back(randomSample(generator));
-	}
+// codes
 
-	// y = ax + b
-	for (int i = 0; i < 100; i++)
-	{
-		float a = 2.0f;
-		float b = -2.0;
-		float noise = 0.2;
-		float randomLine = line(generator);
-		float randomX = randomSample(generator) + randomLine;
-		float randomY = a * randomX + noise * randomLine + b;
-		if (randomX > 0 && randomY > 0 && randomX < 5 && randomY < 5)
-		{
-			data.push_back(CamelVector::Vector2D(randomX, randomY));
-//			x.push_back(randomX);
-//			y.push_back(randomY);
-		}
-	}
-	std::cout << "Random Points Num : " << data.size() << std::endl;
-}
+
 int main()
 {
-	std::vector<CamelVector::Vector2D> data;
+	const auto startTime = std::chrono::high_resolution_clock::now();
 
-	makeLinearRegressionSample(data);	// random smaple
+	Model::Plane planeModel;
+	std::vector<CamelVector::Point3D> data;
+	float modelThreshold = 0.002f;
+	float maxIteration = 1000;
 
-	Model::Linear LRModel(data);
+	std::ifstream fin;
+	fin.open("/home/wj/Desktop/Data/ransac/rmd_1000.pcd");
+	std::string line;
 
-	camel::LSM<Model::Linear> lsm(LRModel);
-
-	lsm.FindParams();
-
-	int range = 5000;
-	float dt = 0.001;
-	std::vector<CamelVector::Vector2D> outputData;
-
-	for (int i = 0; i < range; i++)
+	if (fin.is_open())
 	{
-	outputX.push_back(dt * i);
+		int num = 1;
+		while (!fin.eof())
+		{
+			getline(fin, line);
+			if (num > 10)
+			{
+				float dataX, dataY, dataZ;
+				std::istringstream iss(line);
+				iss >> dataX >> dataY >> dataZ;
+				CamelVector::Point3D point = { dataX, dataY, dataZ };
+				data.push_back(point);
+			}
+			num++;
+		}
 	}
-	//	lsm.GetModel().PredictOutputY(outputX, outputY);
-	lsm.GetOutputByParams(outputX, outputY);
-	std::cout << lsm.GetModel().GetParamsA() <<  ", " << lsm.GetModel().GetParamsB() << std::endl;
+	fin.close();
 
-	// matplot
-	matplotlibcpp::scatter(lsm.GetModel().GetInputX(), lsm.GetModel().GetInputY());
+	camel::RANSAC<Model::Plane, CamelVector::Point3D> ransac(planeModel, data, modelThreshold, maxIteration);
 
-	matplotlibcpp::plot(outputX, outputY);
-	matplotlibcpp::show();
+	if(ransac.bRun())
+	{
+		std::vector<float> result = ransac.GetBestModelParameters();
+		ransac.GetResult();
+
+		std::cout << "result : ";
+		for (int i = 0; i < result.size(); i++)
+		{
+			std::cout << result[i] << " ";
+		}
+		std::cout << std::endl;
+	}
+
+	const auto stopTime = std::chrono::high_resolution_clock::now();
+	const auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(stopTime - startTime);
+	std::cout << "elapsed time : " << elapsedTime.count() << " ms." << std::endl;
 }

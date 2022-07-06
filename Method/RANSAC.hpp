@@ -36,6 +36,7 @@ namespace camel
 		, mMaxIteration(maxIteration)
 		{
 			mModel.SetModelThreshold(modelThreshold);
+			mModelThreshold = modelThreshold;
 		}
 
 		void SetData(std::vector<CamelVector>& data)
@@ -87,15 +88,20 @@ namespace camel
 
 		void GetResult()
 		{
-			std::vector<CamelVector> resuilt;
+			std::cout << "GetResult : " << mData.size() << std::endl;
 			for (int i = 0; i < mData.size(); i++)
 			{
-				if (mModel.bIsInThreshold(mData[i]))
+				if (bIsContained(mData[i]))
 				{
-					resuilt.push_back(mData);
+					mResultData.push_back(mData[i]);
 				}
 			}
 		}
+
+		std::vector<CamelVector> GetResultData() const
+		{
+			return mResultData;
+		};
 
 	private:
 		std::vector<CamelVector> getRandomPoints() const
@@ -127,11 +133,22 @@ namespace camel
 			return inlierNum;
 		}
 
+		bool bIsContained(CamelVector& data)
+		{
+			float distance = std::abs(mBestModelParameters[0] * data.GetX() + mBestModelParameters[1] * data.GetY() - data.GetZ() + mBestModelParameters[2]) / std::sqrt(mBestModelParameters[0] * mBestModelParameters[0] + mBestModelParameters[1] * mBestModelParameters[1] + 1);
+			if (distance < mModelThreshold)
+			{
+				return true;
+			}
+			return false;
+		}
+
 		Model mModel;
 		std::vector<CamelVector> mData;
 		std::vector<CamelVector> mResultData;
 
 		int mMaxIteration = 0;
+		float mModelThreshold = 0;
 		std::vector<float> mBestModelParameters;
 		int mInlierNum = 0;
 	};

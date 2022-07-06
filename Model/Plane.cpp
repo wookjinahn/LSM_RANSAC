@@ -50,6 +50,8 @@ namespace Model
 
 	void Plane::FindParametersWithRandom(std::vector<CamelVector::Point3D>& randomPoints)
 	{
+		mParameters.clear();
+
 		CamelVector::Point3D point0 = randomPoints[0];
 		CamelVector::Point3D point1 = randomPoints[1];
 		CamelVector::Point3D point2 = randomPoints[2];

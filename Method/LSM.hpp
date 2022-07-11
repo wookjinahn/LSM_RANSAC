@@ -6,7 +6,6 @@
 #define LSM_RANSAC_LSM_HPP
 
 #include <vector>
-#include "../Model/Linear.hpp"
 #include "../Model/Plane.hpp"
 
 namespace camel

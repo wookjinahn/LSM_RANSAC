@@ -4,7 +4,6 @@ project(LSM_RANSAC)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(ransac main.cpp Method/RANSAC.hpp Method/LSM.hpp
-        Model/Linear.cpp
         Model/Plane.cpp)
 
 find_package(camel-euclid-vector REQUIRED)

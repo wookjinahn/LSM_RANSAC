@@ -10,12 +10,7 @@
 
 #include "Method/RANSAC.hpp"
 #include "Method/LSM.hpp"
-#include "Model/Linear.hpp"
 #include "Model/Plane.hpp"
-
-
-// codes
-
 
 int main()
 {

@@ -11,7 +11,6 @@
 #include <camel-euclid/Point3D.h>
 #include <camel-euclid/Point2D.h>
 
-#include "../Model/Linear.hpp"
 #include "../Model/Plane.hpp"
 
 namespace camel

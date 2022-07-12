@@ -6,8 +6,9 @@
 #define LSM_RANSAC_PLANE_H
 
 #include <vector>
+#include <cmath>
 #include <camel-euclid/Point3D.h>
-#include <opencv2/opencv.hpp>
+//#include <opencv2/opencv.hpp>
 
 namespace Model
 {
@@ -21,10 +22,10 @@ namespace Model
 		std::vector<float> GetParameters() const;
 		void SetModelThreshold(float modelThreshold);
 
-		void FindParametersWithAll(std::vector<CamelVector::Point3D>& data);
-		void FindParametersWithRandom(std::vector<CamelVector::Point3D>& randomPoints);
+		void FindParametersWithAll(std::vector<camelVector::Point3D>& data);
+		void FindParametersWithRandom(std::vector<camelVector::Point3D>& randomPoints);
 
-		bool bIsInThreshold(CamelVector::Point3D& data);
+		bool bIsInThreshold(camelVector::Point3D& data);
 	private:
 		std::vector<float> mParameters;		// 여러개의 plane이 생길 경우도 생각.
 

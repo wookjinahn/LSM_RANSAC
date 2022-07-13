@@ -48,14 +48,14 @@ namespace camel
 			return mData;
 		}
 
-        void SetMinimumInlierNum(int inilerNum)
-        {
-            mMinimumInlierNum = inilerNum;
-        }
-
 		std::vector<float> GetBestModelParameters() const
 		{
 			return mBestModelParameters;
+		}
+
+		std::vector<Model> GetResultModel() const
+		{
+			return mResultModel;
 		}
 
 		bool bRun()
@@ -80,114 +80,57 @@ namespace camel
 				return false;
 			}
 
-			std::cout << "Best model params : ";
-			for (int i = 0; i < mBestModelParameters.size(); i++)
-			{
-				std::cout << mBestModelParameters[i] << " ";
-			}
-			std::cout << std::endl;
-
 			return true;
 		}
 
-        bool bRunMulti()
+        void RunUpper()
         {
-            int iter = 0;
-            while (iter != mMaxIteration)
-            {
-                std::vector<camelVector> randomPoints = getRandomPoints();
-                mModel.FindParametersWithRandom(randomPoints);		    // mModel->mParameters에 들어가 있음.
-                int inlierNum = getInlierNum();
+			int iter = 0;
+			while (iter < mMaxIteration)
+			{
+				int upperPointsNum = 50;
+				std::vector<camelVector> upperPoints = getUpperPoints(upperPointsNum);      // 가까운 거 50개
 
-//                if (mInlierNum < inliearNum)	// update
-//                {
-//
-//                    mBestModelParameters = mModel.GetParameters();		// get mModel->mParameters
-//                    mInlierNum = inliearNum;
-//                }
-                if (mMinimumInlierNum < inlierNum)
-                {
-                    std::cout << "inlierNum : " << inlierNum << std::endl;
-                    mInlierNum = 0;
-                    mBestModelParameters.push_back(mModel.GetParameters()[0]);
-                    mBestModelParameters.push_back(mModel.GetParameters()[1]);
-                    mBestModelParameters.push_back(mModel.GetParameters()[2]);
-                }
-                iter++;
-            }
+				for (int i = 0; i < upperPointsNum; i++)
+				{
+					std::vector<camelVector> randomPoints = getRandomPoints(upperPoints);       // 가까운 거 50개 중 랜덤
 
-            if (mBestModelParameters.empty())
-            {
-                std::cout << "ransac running fail" << std::endl;
-                return false;
-            }
+					mModel.FindParametersWithRandom(randomPoints);            // mModel->mParameters에 들어가 있음.
+					int inliearNum = getInlierNum(upperPoints);             // 가까운 거 뽑은 50개들 중에서 inlier
 
-//            std::cout << "Best model params : ";
-//            for (int i = 0; i < mBestModelParameters.size(); i++)
-//            {
-//                std::cout << mBestModelParameters[i] << " ";
-//            }
-//            std::cout << std::endl;
+					if (mInlierNum < inliearNum)    // update
+					{
+						mBestModelParameters = mModel.GetParameters();        // get mModel->mParameters
+						mInlierNum = inliearNum;
+					}
+				}
 
-            return true;
-        }
+				if (!mBestModelParameters.empty())
+				{
+					GetResultMulti();
+					Model bestModel(mResultData, mBestModelParameters);
+					mResultModel.push_back(bestModel);
+					mResultData.clear();
+				}
 
-        bool bRunUpper()
-        {
-            int upperPointsNum = 50;
-
-            for (int i = 0; i < upperPointsNum; i++)
-            {
-                std::vector<camelVector> upperPoints = getUpperPoints(upperPointsNum);      // 가까운 거 50개
-                std::cout << "upperPoints : " << upperPoints.size() << std::endl;
-                std::vector<camelVector> randomPoints = getRandomPoints(upperPoints);       // 가까운 거 50개 중 랜덤
-                std::cout << "randomPoints : " << randomPoints.size() << std::endl;
-                for (int i = 0; i < randomPoints.size(); i++)
-                {
-                    std::cout << randomPoints[i].GetX() << ", " << randomPoints[i].GetY() << ", " << randomPoints[i].GetZ() << std::endl;
-                }
-
-                mModel.FindParametersWithRandom(randomPoints);		    // mModel->mParameters에 들어가 있음.
-                int inliearNum = getInlierNum(upperPoints);             // 가까운 거 뽑은 50개들 중에서 inlier
-                std::cout << "inlierNum : " << inliearNum << std::endl;
-
-                if (mInlierNum < inliearNum)	// update
-                {
-                    mBestModelParameters = mModel.GetParameters();		// get mModel->mParameters
-                    mInlierNum = inliearNum;
-                }
-            }
-
-            if (mBestModelParameters.empty())
-            {
-                std::cout << "ransac running fail" << std::endl;
-                return false;
-            }
-
-            std::cout << "Best model params : ";
-            for (int i = 0; i < mBestModelParameters.size(); i++)
-            {
-                std::cout << mBestModelParameters[i] << " ";
-            }
-            std::cout << std::endl;
-
-            return true;
+				iter += 50;
+			}
         }
 
 		void GetResultMulti()
 		{
-			std::cout << "GetResult : " << mData.size() << std::endl;
-            for (int i = 0; i < mBestModelParameters.size() / 3; i++)
-            {
-                std::vector<float> parameters = { mBestModelParameters[i * 3 + 0], mBestModelParameters[i * 3 + 1], mBestModelParameters[i * 3 + 2] };
-                for (int j = 0; j < mData.size(); j++)
-                {
-                    if (bIsContained(mData[j], parameters))
-                    {
-                        mResultData.push_back(mData[j]);
-                    }
-                }
-            }
+			int check = 0;
+			std::vector<int> containedIndex;
+			for (int i = 0; i < mData.size(); i++)
+			{
+				if (bIsContained(mData[i]))
+				{
+					mResultData.push_back(mData[i]);
+					check++;
+					mData.erase(mData.begin() + i);
+				}
+			}
+			std::cout << "check : " << check << " after erase : " << mData.size() << std::endl;
 		}
 
         void GetResult()
@@ -220,7 +163,6 @@ namespace camel
 			{
 				int iter = randomSample(generator);
 				randomPoints.push_back(upperPoints[iter]);
-                std::cout << upperPoints[iter].GetX() << ", " << upperPoints[iter].GetY() << ", " << upperPoints[iter].GetZ() << std::endl;
 			}
 
 			return randomPoints;
@@ -296,7 +238,8 @@ namespace camel
 
 		bool bIsContained(camelVector& data)
 		{
-			float distance = std::abs(mBestModelParameters[0] * data.GetX() + mBestModelParameters[1] * data.GetY() - data.GetZ() + mBestModelParameters[2]) / std::sqrt(mBestModelParameters[0] * mBestModelParameters[0] + mBestModelParameters[1] * mBestModelParameters[1] + 1);
+			float distance = std::abs(mBestModelParameters[0] * data.GetX() + mBestModelParameters[1] * data.GetY() + mBestModelParameters[2] * data.GetZ() - 1) / std::sqrt(mBestModelParameters[0] * mBestModelParameters[0] + mBestModelParameters[1] * mBestModelParameters[1] + mBestModelParameters[2] * mBestModelParameters[2]);
+//			float distance = std::abs(mBestModelParameters[0] * data.GetX() + mBestModelParameters[1] * data.GetY() - data.GetZ() + mBestModelParameters[2]) / std::sqrt(mBestModelParameters[0] * mBestModelParameters[0] + mBestModelParameters[1] * mBestModelParameters[1] + 1);
 			if (distance < mModelThreshold)
 			{
 				return true;
@@ -316,12 +259,12 @@ namespace camel
 		Model mModel;
 		std::vector<camelVector> mData;
 		std::vector<camelVector> mResultData;
+		std::vector<Model> mResultModel;
 
 		int mMaxIteration = 0;
 		float mModelThreshold = 0;
 		std::vector<float> mBestModelParameters;
 		int mInlierNum = 0;
-        int mMinimumInlierNum = 307200;     // 640 * 480
 	};
 }
 

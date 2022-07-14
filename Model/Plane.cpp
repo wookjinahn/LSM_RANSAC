@@ -95,10 +95,10 @@ namespace Model
         float parameterB = (adj_A10 + adj_A11 + adj_A12) / det_A;
         float parameterC = (adj_A20 + adj_A21 + adj_A22) / det_A;
 
-        mParameters.push_back(parameterA);
-        mParameters.push_back(parameterB);
-        mParameters.push_back(parameterC);
-
+//        mParameters.push_back(parameterA);
+//        mParameters.push_back(parameterB);
+//        mParameters.push_back(parameterC);
+		mParameters = { parameterA, parameterB, parameterC };
 
 		//=============================================================================================================================
 
@@ -175,8 +175,8 @@ namespace Model
         float y = data.GetY();
         float z = data.GetZ();
 
-//		float distance = std::abs(mParameters[0] * x + mParameters[1] * y - z + mParameters[2]) / std::sqrt(mParameters[0] * mParameters[0] + mParameters[1] * mParameters[1] + 1);
 		float distance = std::abs(mParameters[0] * x + mParameters[1] * y + mParameters[2] * z - 1) / std::sqrt(mParameters[0] * mParameters[0] + mParameters[1] * mParameters[1] + mParameters[2] * mParameters[2]);
+
 		if (distance < mModelThreshold)
 		{
 			return true;

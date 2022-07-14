@@ -19,7 +19,7 @@
 void fromPCD(std::vector<camelVector::Point3D>& data)
 {
     std::ifstream fin;
-    fin.open("/home/wj/Desktop/Data/palletizeBox.pcd");
+    fin.open("/home/wj/Desktop/Data/palletizeBox2.pcd");
     std::string line;
 
     if (fin.is_open())
@@ -142,7 +142,7 @@ void toPCD(std::vector<camelVector::Point3D>& data)
 
 void toPCD(Model::Plane& model, int number)
 {
-	std::cout << "output : " << model.GetData().size() << std::endl;
+	std::cout << "output : " << model.GetData().size() << "\t : " << model.GetParameters()[0] << ", " << model.GetParameters()[1] << ", " << model.GetParameters()[2] << std::endl;
 	std::string outputPath = "/home/wj/Desktop/Data/output_data/";
 	time_t t;
 	struct tm* timeinfo;
@@ -185,21 +185,6 @@ int main()
 {
     const auto startTime = std::chrono::high_resolution_clock::now();
 
-//	std::vector<int> test = { 11, 22, 33, 44, 55, 66, 77, 88 };
-//	for (int i = 0; i < test.size(); i++)
-//	{
-//		if (test[i] == 33 || test[i] == 77)
-//		{
-//			test.erase(test.begin() + i);
-//		}
-//	}
-//	for (int i = 0; i < test.size(); i++)
-//	{
-//		std::cout << test[i] << " ";
-//	}
-//	std::cout << std::endl;
-//
-//
     Model::Plane planeModel;
     std::vector<camelVector::Point3D> data;
 	fromPCD(data);
@@ -207,7 +192,7 @@ int main()
 	std::sort(data.begin(), data.end(), camelVector::Point3D::AscendingByY);
 	std::cout << "input data : " << data.size() << std::endl;
 
-    float modelThreshold = 0.01f;
+    float modelThreshold = 0.005f;
     int maxIteration = data.size();
 
     camel::RANSAC<Model::Plane, camelVector::Point3D> ransac(planeModel, data, modelThreshold, maxIteration);
@@ -216,10 +201,17 @@ int main()
 
 	std::cout << "result data : " << ransac.GetResultModel().size() << std::endl;
 
-	toPCD(ransac.GetResultModel()[0], 0);
-	toPCD(ransac.GetResultModel()[1], 1);
-	toPCD(ransac.GetResultModel()[2], 2);
-	toPCD(ransac.GetResultModel()[3], 3);
+	for (int i = 0; i < ransac.GetResultModel().size(); i++)
+	{
+		toPCD(ransac.GetResultModel()[i], i);
+	}
+
+	// 0 : 88
+	// 1 : 426
+	// 2 - 1 : 222 : right
+	// 2 - 2 : 82 :  left
+	// 3 : 274 + 132 + 275
+	// 4 : 472
 
 	// ============================================================================================================
 
@@ -241,3 +233,23 @@ int main()
 	const auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(stopTime - startTime);
 	std::cout << "elapsed time : " << elapsedTime.count() << " us." << std::endl;
 }
+
+
+
+
+//	std::vector<int> test = { 11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 222, 333, 444, 555, 666, 777, 888, 999, 1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888, 9999 };
+//	for (int i = 0; i < test.size(); i++)
+//	{
+//		if (test[i] == 33 || test[i] == 77 || test[i] == 88 || test[i] == 99 || test[i] == 333 || test[i] == 555
+//		                  || test[i] == 1111 || test[i] == 3333 || test[i] == 6666 || test[i] == 9999)
+//		{
+//			test.erase(test.begin() + i);
+//			i--;
+//		}
+//	}
+//	std::cout << test.size() << std::endl;
+//	for (int i = 0; i < test.size(); i++)
+//	{
+//		std::cout << test[i] << " ";
+//	}
+//	std::cout << std::endl;

@@ -7,8 +7,8 @@
 
 #include <vector>
 #include <cmath>
-#include <camel-euclid/Point3D.h>
-#include <opencv2/opencv.hpp>
+#include <camel-euclid/Point3D.hpp>
+//#include <opencv2/opencv.hpp>
 
 namespace Model
 {

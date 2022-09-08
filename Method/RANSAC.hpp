@@ -8,8 +8,8 @@
 #include <iostream>
 #include <random>
 
-#include <camel-euclid/Point3D.h>
-#include <camel-euclid/Point2D.h>
+#include <camel-euclid/Point3D.hpp>
+#include <camel-euclid/Point2D.hpp>
 
 #include "../Model/Plane.hpp"
 

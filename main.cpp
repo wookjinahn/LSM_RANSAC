@@ -8,7 +8,7 @@
 #include <algorithm>
 
 //#include <matplotlibcpp.h>
-#include <camel-euclid/Vector.h>
+#include <camel-euclid/Vector.hpp>
 
 #include "Method/RANSAC.hpp"
 #include "Method/LSM.hpp"

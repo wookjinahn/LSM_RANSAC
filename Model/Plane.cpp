@@ -8,31 +8,31 @@
 
 namespace Model
 {
-	Plane::Plane()
-	{
-	}
+    Plane::Plane()
+    {
+    }
 
-	Plane::Plane(std::vector<camelVector::Point3D>& data, std::vector<float>& parameter)
-	{
-		mData = data;
-		mParameters = parameter;
-	}
+    Plane::Plane(std::vector<camelvector::Point3D>& data, std::vector<float>& parameter)
+    {
+        mData = data;
+        mParameters = parameter;
+    }
 
-	std::vector<float> Plane::GetParameters() const
-	{
-		return mParameters;
-	}
+    std::vector<float> Plane::GetParameters() const
+    {
+        return mParameters;
+    }
 
-	void Plane::SetModelThreshold(float modelThreshold)
-	{
-		mModelThreshold = modelThreshold;
-	}
+    void Plane::SetModelThreshold(float modelThreshold)
+    {
+        mModelThreshold = modelThreshold;
+    }
 
 
-	std::vector<camelVector::Point3D> Plane::GetData() const
-	{
-		return mData;
-	}
+    std::vector<camelvector::Point3D> Plane::GetData() const
+    {
+        return mData;
+    }
 
 
 //	void Plane::FindParametersWithAll(std::vector<CamelVector::Point3D>& data) 	// ax + by + c = z
@@ -65,9 +65,9 @@ namespace Model
 //		mParameters.push_back(paramsMat.at<float>(0, 2));
 //	}
 
-	void Plane::FindParametersWithRandom(std::vector<camelVector::Point3D>& randomPoints)
-	{
-		mParameters.clear();
+    void Plane::FindParametersWithRandom(std::vector<camelvector::Point3D>& randomPoints)
+    {
+        mParameters.clear();
 
         float x1 = randomPoints[0].GetX();
         float y1 = randomPoints[0].GetY();
@@ -98,9 +98,9 @@ namespace Model
 //        mParameters.push_back(parameterA);
 //        mParameters.push_back(parameterB);
 //        mParameters.push_back(parameterC);
-		mParameters = { parameterA, parameterB, parameterC };
+        mParameters = { parameterA, parameterB, parameterC };
 
-		//=============================================================================================================================
+        //=============================================================================================================================
 
 //        mParameters.clear();
 //
@@ -133,7 +133,7 @@ namespace Model
 //		mParameters.push_back(paramsMat.at<float>(0, 2));
 //        std::cout << "FindParametersWithRandom : " << mParameters[0] << ", " << mParameters[1] << ", " << mParameters[2] << std::endl;
 
-		//=============================================================================================================================
+        //=============================================================================================================================
 
 //		mParameters.clear();
 
@@ -167,20 +167,20 @@ namespace Model
 //        mParameters.push_back(parameterB);
 //        mParameters.push_back(parameterC);
 //        std::cout << "FindParametersWithRandom : " << parameterA << ", " << parameterB << ", " << parameterC << std::endl;
-	}
+    }
 
-	bool Plane::bIsInThreshold(camelVector::Point3D& data)
-	{
+    bool Plane::bIsInThreshold(camelvector::Point3D& data)
+    {
         float x = data.GetX();
         float y = data.GetY();
         float z = data.GetZ();
 
-		float distance = std::abs(mParameters[0] * x + mParameters[1] * y + mParameters[2] * z - 1) / std::sqrt(mParameters[0] * mParameters[0] + mParameters[1] * mParameters[1] + mParameters[2] * mParameters[2]);
+        float distance = std::abs(mParameters[0] * x + mParameters[1] * y + mParameters[2] * z - 1) / std::sqrt(mParameters[0] * mParameters[0] + mParameters[1] * mParameters[1] + mParameters[2] * mParameters[2]);
 
-		if (distance < mModelThreshold)
-		{
-			return true;
-		}
-		return false;
-	}
+        if (distance < mModelThreshold)
+        {
+            return true;
+        }
+        return false;
+    }
 }

@@ -7,7 +7,8 @@
 
 #include <vector>
 #include <cmath>
-#include <camel-euclid/Point3D.hpp>
+//#include <camel-euclid/Point3D.hpp>
+#include <camel-euclid-vector/Point3D.hpp>
 //#include <opencv2/opencv.hpp>
 
 namespace Model
@@ -20,22 +21,22 @@ namespace Model
 
 	public:
 		Plane();
-		Plane(std::vector<camelVector::Point3D>& data, std::vector<float>& parameter);
+		Plane(std::vector<camelvector::Point3D>& data, std::vector<float>& parameter);
 
 		std::vector<float> GetParameters() const;
 		void SetModelThreshold(float modelThreshold);
-		std::vector<camelVector::Point3D> GetData() const;
+		std::vector<camelvector::Point3D> GetData() const;
 
-		void FindParametersWithAll(std::vector<camelVector::Point3D>& data);
-		void FindParametersWithRandom(std::vector<camelVector::Point3D>& randomPoints);
+		void FindParametersWithAll(std::vector<camelvector::Point3D>& data);
+		void FindParametersWithRandom(std::vector<camelvector::Point3D>& randomPoints);
 
-		bool bIsInThreshold(camelVector::Point3D& data);
+		bool bIsInThreshold(camelvector::Point3D& data);
 	private:
 		std::vector<float> mParameters;		// 여러개의 plane이 생길 경우도 생각.
 
 		float mModelThreshold = 0.0f;
 
-		std::vector<camelVector::Point3D> mData;
+		std::vector<camelvector::Point3D> mData;
 	};
 }
 

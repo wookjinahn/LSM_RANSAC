@@ -5,10 +5,11 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(ransac main.cpp Method/RANSAC.hpp Method/LSM.hpp
         Model/Plane.cpp)
-#add_executable(ransac main.cpp )
 
-find_package(camel-euclid-vector REQUIRED)
-target_link_libraries(ransac camel-euclid-vector)
+target_link_libraries(ransac
+        camel-euclid-vector
+        camel-perception-heightmap
+)
 #
 #find_package( OpenCV REQUIRED )
 #
